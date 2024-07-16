@@ -58,6 +58,7 @@ composer install
 
 #### - Endpoint de personajes
 - El endpoint */api/people* está disponible para obtener los datos de los personajes en formato JSON. Puedes acceder a él mediante una solicitud POST.
+- Para elegir la página, puedes enviar un form-data con la clave *page* y en valor un valor númerico de la página a visualizar.
 
 ## Notas Adicionales
 #### - Configuración de Cache:
