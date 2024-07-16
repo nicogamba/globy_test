@@ -1,58 +1,88 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>SocialPubli-test</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
-<body>
-    <h1>Personajes de Star Wars</h1>
-    <form id="fetch-people-form">
-        <label for="page">Página:</label>
-        <input type="number" id="page" name="page" value="1" min="1">
-        <button type="submit">Obtener datos</button>
+{% extends 'base.html.twig' %}
+
+{% block title %}SocialPubli-test{% endblock %}
+
+{% block body %}
+
+<div class="container">
+    <h1 class="my-4">Personajes de Star Wars</h1>
+    <form id="fetch-people-form" class="mb-3">
+        <label for="pageInput" class="form-label">Página:</label>
+        <input type="number" id="pageInput" name="pageInput" value="1" min="1" class="form-control mb-2">
+        <button type="submit" class="btn btn-primary">Obtener datos</button>
     </form>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Altura</th>
-                <th>Masa</th>
-                <th>Color de pelo</th>
-                <th>Color de piel</th>
-                <th>Color de ojos</th>
-                <th>Año de nacimiento</th>
-                <th>Género</th>
-            </tr>
-        </thead>
-        <tbody id="people-table-body">
-        </tbody>
-    </table>
+
+    <div id="charactersTable" class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Altura</th>
+                    <th>Masa</th>
+                    <th>Color de pelo</th>
+                    <th>Color de piel</th>
+                    <th>Color de ojos</th>
+                    <th>Año de nacimiento</th>
+                    <th>Género</th>
+                </tr>
+            </thead>
+            <tbody>
+                {# {% for character in characters %}
+                    <tr>
+                        <td>${person.name}</td>
+                        <td>${person.height}</td>
+                        <td>${person.mass}</td>
+                        <td>${person.hair_color}</td>
+                        <td>${person.skin_color}</td>
+                        <td>${person.eye_color}</td>
+                        <td>${person.birth_year}</td>
+                        <td>${person.gender}</td>
+                    </tr> #}
+                {# {% endfor %} #}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
     <script>
         $(document).ready(function() {
-            $('#fetch-people-form').on('submit', function(event) {
+            document.getElementById('fetch-people-form').addEventListener('submit', function(event) {
                 event.preventDefault();
-                let page = $('#page').val();
-                $.post('/api/people', { page: page }, function(data) {
-                    let tbody = $('#people-table-body');
-                    tbody.empty();
-                    data.results.forEach(function(person) {
-                        tbody.append(`
-                            <tr>
-                                <td>${person.name}</td>
-                                <td>${person.height}</td>
-                                <td>${person.mass}</td>
-                                <td>${person.hair_color}</td>
-                                <td>${person.skin_color}</td>
-                                <td>${person.eye_color}</td>
-                                <td>${person.birth_year}</td>
-                                <td>${person.gender}</td>
-                            </tr>
-                        `);
-                    });
-                });
+                let page = document.getElementById('pageInput').value;
+
+                const formdata = new FormData();
+                formdata.append("page", page);
+
+                const requestOptions = {
+                method: "POST",
+                body: formdata
+                };
+
+                fetch(`/api/people`, requestOptions)
+                    .then(response => response.json())
+                    .then(data => {
+                        let tableBody = document.querySelector('#charactersTable tbody');
+                        tableBody.innerHTML = '';
+                        data.results.forEach(character => {
+                            tableBody.innerHTML += `
+                                <tr>
+                                    <td>${character.name}</td>
+                                    <td>${character.height}</td>
+                                    <td>${character.mass}</td>
+                                    <td>${character.hair_color}</td>
+                                    <td>${character.skin_color}</td>
+                                    <td>${character.eye_color}</td>
+                                    <td>${character.birth_year}</td>
+                                    <td>${character.gender}</td>
+                                </tr>
+                            `;
+                        });
+                        console.log(tableBody);
+                    })
+                    .catch(error => console.error('Error fetching data:', error));
             });
-        });
+        })
     </script>
-</body>
-</html>
+{% endblock %}
